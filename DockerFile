@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8501
 
 # Set the entry point for the container
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port", "8501", "--server.ip", "0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
