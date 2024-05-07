@@ -1,3 +1,0 @@
-# Streamlit related
-streamlit==1.33
-Streamlit-extras
