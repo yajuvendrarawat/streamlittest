@@ -1,4 +1,15 @@
 # Streamlit related
-streamlit==1.33
-Streamlit-extras
+langchain
+torch
+accelerate
+sentence_transformers
+streamlit_chat
+streamlit==1.33 ##exlude 1.34 as there is a bug its fixed in 1.35 but not released yet
+faiss-cpu
+tiktoken
+ctransformers
+huggingface-hub
+pypdf
 python-dotenv
+replicate
+docx2txt
