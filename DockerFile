@@ -1,5 +1,6 @@
 # Use the official Python base image
-FROM python:3.9
+# FROM python:3.9
+FROM ubi8/ubi-minimal:8.5
 
 # Install necessary packages for NVIDIA support
 RUN microdnf install -y \
