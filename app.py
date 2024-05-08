@@ -104,7 +104,7 @@ def main():
         text_chunks = text_splitter.split_documents(text)
 
         # Create embeddings
-        embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", 
+        embeddings = HuggingFaceInstructEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", 
                                            model_kwargs={'device': 'cuda:0'})
 
         # Create vector store
