@@ -1,6 +1,41 @@
 # Use the official Python base image
-#FROM python:3.9
-FROM nvidia/cuda:12.2.0-devel-ubi9
+FROM python:3.9
+
+# Install necessary packages for NVIDIA support
+RUN microdnf install -y \
+    nvidia-driver-latest-dkms \
+    nvidia-container-toolkit \
+    nvidia-container-runtime
+
+# Set environment variables for NVIDIA runtime
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
+
+# Install required libraries and dependencies for Streamlit
+RUN microdnf install -y \
+    python3 \
+    python3-pip \
+ && microdnf clean all
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the requirements.txt file into the container
+COPY ./requirements.txt .
+
+# Install the dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application files into the container
+COPY . .
+
+# Expose the port that Streamlit runs on
+EXPOSE 8501
+
+# Set the entry point for the container
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+
+#FROM nvidia/cuda:12.2.0-devel-ubi9
 #RUN yum -y update \
 #    && yum -y install gcc  \
 #    && yum -y install gcc-c++  \
@@ -31,24 +66,8 @@ FROM nvidia/cuda:12.2.0-devel-ubi9
 ## MAKE ALL BELOW RUN COMMANDS USE THE NEW CONDA ENVIRONMENT
 #RUN echo "conda activate myconda" >> ~/.bashrc
 
-# Copy the requirements.txt file into the container
-COPY ./requirements.txt .
-
-# Install the dependencies
-RUN pip install --no-cache-dir -r requirements.txt
 #RUN --mount=type=cache,target=/root/.cache  pip install --timeout 100 -r requirements.txt
 
 #RUN --mount=type=cache,target=/root/.cache CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --upgrade --force-reinstall llama-cpp-python
 #COPY SOURCE_DOCUMENTS ./SOURCE_DOCUMENTS
 
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy the rest of the application files into the container
-COPY . .
-
-# Expose the port that Streamlit runs on
-EXPOSE 8501
-
-# Set the entry point for the container
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
