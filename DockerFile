@@ -2,7 +2,7 @@
 # FROM python:3.9
 # FROM ubi8/ubi-minimal:8.5
 # FROM nvidia/cuda:12.2.0-devel-ubi9
-FROM nvidia/12.4.1-runtime-ubi9
+FROM nvidia/cuda:12.4.1-runtime-ubi9
 
 # Install required libraries and dependencies for Streamlit
 RUN yum install -y \
