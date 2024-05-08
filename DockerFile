@@ -18,7 +18,7 @@ RUN yum -y update \
 ENV PATH /opt/conda/bin:$PATH
 
 ## COPY ENV REQUIREMENTS FILES
-## COPY ./env_config.yml /tmp/env_config.yml
+COPY ./env_config.yml /tmp/env_config.yml
 
 ## CREATE CONDA ENVIRONMENT USING YML FILE
 RUN conda update conda \
