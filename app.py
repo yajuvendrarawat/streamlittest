@@ -12,6 +12,7 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.document_loaders import TextLoader
 from langchain.document_loaders import Docx2txtLoader
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+import torch
 import os
 from dotenv import load_dotenv
 import tempfile
@@ -74,6 +75,7 @@ def create_conversational_chain(vector_store):
 
 def main():
     load_dotenv()
+    torch.cuda.is_available()
     # Initialize session state
     initialize_session_state()
     st.title("Multi-Docs ChatBot using llama2 :books:")
