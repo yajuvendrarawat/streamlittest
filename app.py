@@ -105,7 +105,7 @@ def main():
 
         # Create embeddings
         embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", 
-                                           model_kwargs={'device': 'cuda'})
+                                           model_kwargs={'device': 'cuda:0'})
 
         # Create vector store
         vector_store = FAISS.from_documents(text_chunks, embedding=embeddings)
