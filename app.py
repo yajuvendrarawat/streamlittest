@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit_chat import message
 from langchain.chains import ConversationalRetrievalChain
 from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import HuggingFaceInstructEmbeddings
 from langchain.llms import CTransformers
 from langchain.llms import Replicate
 from langchain.text_splitter import CharacterTextSplitter
