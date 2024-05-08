@@ -1,6 +1,7 @@
 # Use the official Python base image
 #FROM python:3.9
-FROM nvidia/cuda:12.2.0-devel-ubi9
+#FROM nvidia/cuda:12.2.0-devel-ubi9
+FROM nvidia/cuda
 RUN yum -y update \
     && yum -y install gcc  \
     && yum -y install gcc-c++  \
