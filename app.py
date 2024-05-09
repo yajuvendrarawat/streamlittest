@@ -14,6 +14,8 @@ from langchain.document_loaders import Docx2txtLoader
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
+from langchain.llms import HuggingFacePipeline
+
 import torch
 import os
 from dotenv import load_dotenv
@@ -88,8 +90,8 @@ def create_conversational_chain(vector_store):
 def main():
     load_dotenv()
     torch.cuda.is_available()
-    #model_name = "yajuvendra/Llama-2-7b-chat-finetune"
-    model_name = "NousResearch/Llama-2-7b-chat-hf"
+    model_name = "yajuvendra/Llama-2-7b-chat-finetune"
+    #model_name = "NousResearch/Llama-2-7b-chat-hf"
     embedding_model_name= "sentence-transformers/all-MiniLM-L6-v2"
     # Load the entire model on the GPU 0
     device_map = {"": 0}
