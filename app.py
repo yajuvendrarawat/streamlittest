@@ -162,7 +162,7 @@ def main():
             #max_memory={0: "15GB"} # Uncomment this line with you encounter CUDA out of memory errors
         )
 
-        pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=1000)
+        pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=500)
         
         #Create the chain object
         #chain = create_conversational_chain(vector_store)
