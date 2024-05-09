@@ -15,6 +15,7 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain.llms import HuggingFacePipeline
+from langchain.chains import RetrievalQA
 
 import torch
 import os
