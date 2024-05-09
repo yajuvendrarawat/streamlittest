@@ -168,15 +168,19 @@ def main():
         #chain = create_conversational_chain(vector_store)
         llm = HuggingFacePipeline(pipeline=pipe)
 
-        qa = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=retriever,
-        return_source_documents=True,
-        chain_type_kwargs={"prompt": prompt, "memory": memory},
-        )
+        chain = ConversationalRetrievalChain.from_llm(llm=llm, chain_type='stuff',
+                                                 retriever=retriever,
+                                                memory=memory)
+                                                      
+        #qa = RetrievalQA.from_chain_type(
+        #llm=llm,
+        #chain_type="stuff",
+        #retriever=retriever,
+        #return_source_documents=True,
+        #chain_type_kwargs={"prompt": prompt, "memory": memory},
+        #)
 
-        display_chat_history(qa)
+        display_chat_history(chain)
 
 if __name__ == "__main__":
     main()
