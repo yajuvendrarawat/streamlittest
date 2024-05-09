@@ -175,31 +175,8 @@ def main():
         return_source_documents=True,
         chain_type_kwargs={"prompt": prompt, "memory": memory},
         )
-        # Interactive questions and answers
-        while True:
-            query = input("\nEnter a query: ")
-            if query == "exit":
-                break
-            # Get the answer from the chain
-            res = qa(query)
-            answer, docs = res["result"], res["source_documents"]
-    
-            # Print the result
-            print("\n\n> Question:")
-            print(query)
-            print("\n> Answer:")
-            print(answer)
-    
-            if show_sources:  # this is a flag that you can set to disable showing answers.
-                # # Print the relevant sources used for the answer
-                print("----------------------------------SOURCE DOCUMENTS---------------------------")
-                for document in docs:
-                    print("\n> " + document.metadata["source"] + ":")
-                    print(document.page_content)
-                print("----------------------------------SOURCE DOCUMENTS---------------------------")
-    
 
-        #display_chat_history(chain)
+        display_chat_history(qa)
 
 if __name__ == "__main__":
     main()
