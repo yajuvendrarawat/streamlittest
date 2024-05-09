@@ -151,8 +151,11 @@ def main():
         # Load base model
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            quantization_config=bnb_config,
-            device_map=device_map
+            device_map=device_map,
+            torch_dtype=torch.float16,
+            low_cpu_mem_usage=True,
+            trust_remote_code=True,
+            #max_memory={0: "15GB"} # Uncomment this line with you encounter CUDA out of memory errors
         )
 
         pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=1000)
