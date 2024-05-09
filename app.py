@@ -162,7 +162,25 @@ def main():
             #max_memory={0: "15GB"} # Uncomment this line with you encounter CUDA out of memory errors
         )
 
-        pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=500)
+        # Load configuration from the model to avoid warnings
+        generation_config = GenerationConfig.from_pretrained(model_id)
+        # see here for details:
+        # https://huggingface.co/docs/transformers/
+        # main_classes/text_generation#transformers.GenerationConfig.from_pretrained.returns
+
+        #pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=500)
+        # Create a pipeline for text generation
+        pipe = pipeline(
+            "text-generation",
+            model=model,
+            tokenizer=tokenizer,
+            #max_length=10000,
+            max_new_tokens=10000,
+            temperature=0,
+            top_p=0.95,
+            repetition_penalty=1.15,
+            generation_config=generation_config,
+        )
         
         #Create the chain object
         #chain = create_conversational_chain(vector_store)
