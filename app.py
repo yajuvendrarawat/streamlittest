@@ -66,26 +66,6 @@ def display_chat_history(chain):
                 message(st.session_state["past"][i], is_user=True, key=str(i) + '_user', avatar_style="thumbs")
                 message(st.session_state["generated"][i], key=str(i), avatar_style="fun-emoji")
 
-def create_conversational_chain(vector_store):
-    load_dotenv()
-    
-    # Create llm
-    #llm = CTransformers(model="llama-2-7b-chat.ggmlv3.q4_0.bin",
-                        #streaming=True, 
-                        #callbacks=[StreamingStdOutCallbackHandler()],
-                        #model_type="llama", config={'max_new_tokens': 500, 'temperature': 0.01})
-    #llm = Replicate(
-    #    streaming = True,
-    #    model = "yajuvendra/Llama-2-7b-chat-finetune", 
-    #    callbacks=[StreamingStdOutCallbackHandler()],
-    #    input = {"temperature": 0.01, "max_length" :500,"top_p":1})
-    #memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-
-    #chain = ConversationalRetrievalChain.from_llm(llm=llm, chain_type='stuff',
-    #                                             retriever=vector_store.as_retriever(search_kwargs={"k": 2}),
-    #                                            memory=memory)
-    return chain
-
 def main():
     load_dotenv()
     torch.cuda.is_available()
@@ -181,21 +161,11 @@ def main():
             generation_config=generation_config,
         )
         
-        #Create the chain object
-        #chain = create_conversational_chain(vector_store)
         llm = HuggingFacePipeline(pipeline=pipe)
-
+        #Create the chain object
         chain = ConversationalRetrievalChain.from_llm(llm=llm, chain_type='stuff',
                                                  retriever=retriever,
                                                 memory=memory)
-                                                      
-        #qa = RetrievalQA.from_chain_type(
-        #llm=llm,
-        #chain_type="stuff",
-        #retriever=retriever,
-        #return_source_documents=True,
-        #chain_type_kwargs={"prompt": prompt, "memory": memory},
-        #)
 
         display_chat_history(chain)
 
