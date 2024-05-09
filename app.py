@@ -163,7 +163,7 @@ def main():
         )
 
         # Load configuration from the model to avoid warnings
-        generation_config = GenerationConfig.from_pretrained(model_id)
+        generation_config = GenerationConfig.from_pretrained(model_name)
         # see here for details:
         # https://huggingface.co/docs/transformers/
         # main_classes/text_generation#transformers.GenerationConfig.from_pretrained.returns
