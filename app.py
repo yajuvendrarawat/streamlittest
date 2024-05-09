@@ -88,7 +88,8 @@ def create_conversational_chain(vector_store):
 def main():
     load_dotenv()
     torch.cuda.is_available()
-    model_name = "yajuvendra/Llama-2-7b-chat-finetune"
+    #model_name = "yajuvendra/Llama-2-7b-chat-finetune"
+    model_name = "NousResearch/Llama-2-7b-chat-hf"
     embedding_model_name= "sentence-transformers/all-MiniLM-L6-v2"
     # Load the entire model on the GPU 0
     device_map = {"": 0}
