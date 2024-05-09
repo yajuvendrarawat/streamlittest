@@ -12,10 +12,21 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.document_loaders import TextLoader
 from langchain.document_loaders import Docx2txtLoader
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain.prompts import PromptTemplate
+from langchain.memory import ConversationBufferMemory
 import torch
 import os
 from dotenv import load_dotenv
 import tempfile
+# from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    GenerationConfig,
+    LlamaForCausalLM,
+    LlamaTokenizer,
+    pipeline,
+)
 
 def initialize_session_state():
     if 'history' not in st.session_state:
@@ -56,26 +67,32 @@ def display_chat_history(chain):
 
 def create_conversational_chain(vector_store):
     load_dotenv()
+    
     # Create llm
     #llm = CTransformers(model="llama-2-7b-chat.ggmlv3.q4_0.bin",
                         #streaming=True, 
                         #callbacks=[StreamingStdOutCallbackHandler()],
                         #model_type="llama", config={'max_new_tokens': 500, 'temperature': 0.01})
-    llm = Replicate(
-        streaming = True,
-        model = "yajuvendra/Llama-2-7b-chat-finetune", 
-        callbacks=[StreamingStdOutCallbackHandler()],
-        input = {"temperature": 0.01, "max_length" :500,"top_p":1})
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    #llm = Replicate(
+    #    streaming = True,
+    #    model = "yajuvendra/Llama-2-7b-chat-finetune", 
+    #    callbacks=[StreamingStdOutCallbackHandler()],
+    #    input = {"temperature": 0.01, "max_length" :500,"top_p":1})
+    #memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-    chain = ConversationalRetrievalChain.from_llm(llm=llm, chain_type='stuff',
-                                                 retriever=vector_store.as_retriever(search_kwargs={"k": 2}),
-                                                 memory=memory)
+    #chain = ConversationalRetrievalChain.from_llm(llm=llm, chain_type='stuff',
+    #                                             retriever=vector_store.as_retriever(search_kwargs={"k": 2}),
+    #                                            memory=memory)
     return chain
 
 def main():
     load_dotenv()
     torch.cuda.is_available()
+    model_name = "yajuvendra/Llama-2-7b-chat-finetune"
+    embedding_model_name= "sentence-transformers/all-MiniLM-L6-v2"
+    # Load the entire model on the GPU 0
+    device_map = {"": 0}
+    
     # Initialize session state
     initialize_session_state()
     st.title("Multi-Docs ChatBot using llama2 :books:")
@@ -107,16 +124,75 @@ def main():
         text_chunks = text_splitter.split_documents(text)
 
         # Create embeddings
-        embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", 
+        embeddings = HuggingFaceEmbeddings(model_name=embedding_model_name, 
                                            model_kwargs={'device': 'cuda:0'})
 
         # Create vector store
         vector_store = FAISS.from_documents(text_chunks, embedding=embeddings)
 
-        # Create the chain object
-        chain = create_conversational_chain(vector_store)
+        retriever = vector_store.as_retriever()
+        template = """Use the following pieces of context to answer the question at the end. If you don't know the answer,\
+        just say that you don't know, don't try to make up an answer.
+    
+        {context}
+    
+        {history}
+        Question: {question}
+        Helpful Answer:"""
+    
+        prompt = PromptTemplate(input_variables=["history", "context", "question"], template=template)
+        memory = ConversationBufferMemory(input_key="question", memory_key="history")
+
+        # Load LLaMA tokenizer
+        tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+        tokenizer.pad_token = tokenizer.eos_token
+        tokenizer.padding_side = "right" # Fix weird overflow issue with fp16 training
+
+        # Load base model
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            quantization_config=bnb_config,
+            device_map=device_map
+        )
+
+        pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=1000)
         
-        display_chat_history(chain)
+        #Create the chain object
+        #chain = create_conversational_chain(vector_store)
+        llm = HuggingFacePipeline(pipeline=pipe)
+
+        qa = RetrievalQA.from_chain_type(
+        llm=llm,
+        chain_type="stuff",
+        retriever=retriever,
+        return_source_documents=True,
+        chain_type_kwargs={"prompt": prompt, "memory": memory},
+        )
+        # Interactive questions and answers
+        while True:
+            query = input("\nEnter a query: ")
+            if query == "exit":
+                break
+            # Get the answer from the chain
+            res = qa(query)
+            answer, docs = res["result"], res["source_documents"]
+    
+            # Print the result
+            print("\n\n> Question:")
+            print(query)
+            print("\n> Answer:")
+            print(answer)
+    
+            if show_sources:  # this is a flag that you can set to disable showing answers.
+                # # Print the relevant sources used for the answer
+                print("----------------------------------SOURCE DOCUMENTS---------------------------")
+                for document in docs:
+                    print("\n> " + document.metadata["source"] + ":")
+                    print(document.page_content)
+                print("----------------------------------SOURCE DOCUMENTS---------------------------")
+    
+
+        #display_chat_history(chain)
 
 if __name__ == "__main__":
     main()
