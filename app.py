@@ -12,7 +12,7 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.document_loaders import TextLoader
 from langchain.document_loaders import Docx2txtLoader
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.prompts import PromptTemplate
+#from langchain.prompts import PromptTemplate
 from langchain.llms import HuggingFacePipeline
 #from langchain.chains import RetrievalQA
 
@@ -133,17 +133,18 @@ def main():
         vector_store = FAISS.from_documents(text_chunks, embedding=embeddings)
 
         retriever = vector_store.as_retriever()
-        template = """Use the following pieces of context to answer the question at the end. If you don't know the answer,\
-        just say that you don't know, don't try to make up an answer.
+        #template = """Use the following pieces of context to answer the question at the end. If you don't know the answer,\
+        #just say that you don't know, don't try to make up an answer.
     
-        {context}
+        #{context}
     
-        {history}
-        Question: {question}
-        Helpful Answer:"""
+        #{history}
+        #Question: {question}
+        #Helpful Answer:"""
     
-        prompt = PromptTemplate(input_variables=["history", "context", "question"], template=template)
-        memory = ConversationBufferMemory(input_key="question", memory_key="history")
+        #prompt = PromptTemplate(input_variables=["history", "context", "question"], template=template)
+        #memory = ConversationBufferMemory(input_key="question", memory_key="history")
+        memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
         # Load LLaMA tokenizer
         tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
