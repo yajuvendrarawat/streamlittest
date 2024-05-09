@@ -11,7 +11,7 @@ ctransformers
 huggingface-hub
 pypdf
 python-dotenv
-replicate
+# replicate
 docx2txt
 sentence-transformers
 langchain-community
